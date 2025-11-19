@@ -10,7 +10,7 @@ export default function RegisterPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
-    const { register, login } = useAuth();
+    const { register } = useAuth();
     const router = useRouter();
 
     const handleSubmit = async (e: FormEvent) => {
@@ -30,10 +30,14 @@ export default function RegisterPage() {
             setTimeout(() => {
                 router.push('/login');
             }, 2000); // 2 segundos de espera
-
-        } catch (err: any) {
-            // Mostrar el mensaje de error específico del backend
-            const errorMessage = err.response?.data?.detail || 'Error durante el registro. Inténtalo de nuevo.';
+        } catch (err) {
+            let errorMessage = 'Error durante el registro. Inténtalo de nuevo.';
+            if (typeof err === 'object' && err !== null && 'response' in err &&
+                typeof (err as { response?: { data?: { detail?: string } } }).response?.data?.detail === 'string') {
+                errorMessage = (err as { response: { data: { detail: string } } }).response.data.detail;
+            } else if (err instanceof Error) {
+                errorMessage = err.message;
+            }
             setNotification({ message: errorMessage, type: 'error' });
         }
     };

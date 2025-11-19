@@ -1,13 +1,13 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { iniciarSesion, registrarUsuario, getMiPerfil } from '@/services/api';
-import { Usuario, UsuarioCreate } from '@/types';
+import { UsuarioRead, UsuarioCreate } from '@/types';
 
 interface AuthContextType {
     isAuthenticated: boolean;
-    user: Usuario | null;
+    user: UsuarioRead | null;
     login: (email: string, password: string) => Promise<void>;
     logout: () => void;
     register: (nombre: string, email: string, password: string) => Promise<void>;
@@ -17,28 +17,27 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-    const [user, setUser] = useState<Usuario | null>(null);
+    const [user, setUser] = useState<UsuarioRead | null>(null);
     const [loading, setLoading] = useState(true);
     const router = useRouter();
 
-    const fetchUser = useCallback(async () => {
-        const token = localStorage.getItem('token');
-        if (token) {
-            try {
-                const profile = await getMiPerfil(token);
-                setUser(profile);
-            } catch (error) {
-                console.error("Error fetching user profile, logging out.", error);
-                localStorage.removeItem('token');
-                setUser(null);
-            }
-        }
-        setLoading(false);
-    }, []);
-
     useEffect(() => {
-        fetchUser();
-    }, [fetchUser]);
+        const fetchUserOnMount = async () => {
+            const token = localStorage.getItem('token');
+            if (token) {
+                try {
+                    const profile = await getMiPerfil(token);
+                    setUser(profile);
+                } catch (error) {
+                    console.error("Error fetching user profile, logging out.", error);
+                    localStorage.removeItem('token');
+                    setUser(null);
+                }
+            }
+            setLoading(false);
+        };
+        fetchUserOnMount();
+    }, []);
 
     const login = async (email: string, password: string) => {
         try {

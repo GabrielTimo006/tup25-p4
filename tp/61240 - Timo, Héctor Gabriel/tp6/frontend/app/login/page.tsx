@@ -24,11 +24,15 @@ export default function LoginPage() {
         try {
             await login(email, password);
             router.push('/'); // Redirige al inicio después del login exitoso
-        } catch (err: any) {
-            // Mostrar el mensaje de error que viene del backend
-            // o uno genérico si no hay mensaje específico.
-            const errorMessage = err.response?.data?.detail || 'Error al iniciar sesión. Verifica tus credenciales.';
-            setError(errorMessage);
+        } catch (err) {
+            let message = 'Error al iniciar sesión. Verifica tus credenciales.';
+            if (typeof err === 'object' && err !== null && 'response' in err &&
+                typeof (err as { response?: { data?: { detail?: string } } }).response?.data?.detail === 'string') {
+                message = (err as { response: { data: { detail: string } } }).response.data.detail;
+            } else if (err instanceof Error) {
+                message = err.message;
+            }
+            setError(message);
         }
     };
 

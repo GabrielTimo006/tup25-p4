@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { getMisCompras } from '@/services/api';
-import { CompraRead, ItemCompra } from '@/types';
+import { CompraRead, ItemCompraRead } from '@/types';
 import { useRouter } from 'next/navigation';
 
 export default function ComprasPage() {
@@ -32,8 +32,12 @@ export default function ComprasPage() {
                     if (data.length > 0) {
                         setSelectedCompra(data[0]);
                     }
-                } catch (err: any) {
-                    setError(err.message);
+                } catch (err) {
+                    let errorMessage = "Ocurrió un error al cargar las compras.";
+                    if (err instanceof Error) {
+                        errorMessage = err.message;
+                    }
+                    setError(errorMessage);
                 } finally {
                     setLoading(false);
                 }
@@ -43,10 +47,16 @@ export default function ComprasPage() {
     }, [isAuthenticated]);
 
     const formatFecha = (fecha: string) => {
-        return new Date(fecha).toLocaleString('es-AR');
+        const options: Intl.DateTimeFormatOptions = {
+            year: 'numeric', month: '2-digit', day: '2-digit',
+            hour: '2-digit', minute: '2-digit',
+            timeZone: 'America/Argentina/Buenos_Aires'
+        };
+        // Forzamos la interpretación de la fecha como UTC agregando 'Z' al final.
+        return new Date(fecha + 'Z').toLocaleString('es-AR', options);
     };
 
-    const calcularSubtotal = (items: ItemCompra[]) => {
+    const calcularSubtotal = (items: ItemCompraRead[]) => {
         return items.reduce((acc, item) => acc + (item.precio_unitario * item.cantidad), 0);
     };
 
@@ -87,13 +97,11 @@ export default function ComprasPage() {
                                 <h2 className="text-2xl font-semibold mb-4 border-b pb-3 text-black">Detalle de la compra #{selectedCompra.id}</h2>
                                 <div className="grid grid-cols-2 gap-4 text-sm mb-6 text-black">
                                     <div><span className="font-semibold">Fecha:</span> {formatFecha(selectedCompra.fecha)}</div>
-                                    <div><span className="font-semibold">Tarjeta:</span> **** **** **** {selectedCompra.tarjeta.slice(-4)}</div>
-                                    <div className="col-span-2"><span className="font-semibold">Dirección:</span> {selectedCompra.direccion}</div>
                                 </div>
                                 <h3 className="font-semibold mb-3 text-black">Productos</h3>
                                 <div className="space-y-3 mb-6 text-black">
                                     {selectedCompra.items.map(item => (
-                                        <div key={item.id} className="flex justify-between items-center text-sm">
+                                        <div key={item.nombre} className="flex justify-between items-center text-sm">
                                             <span>{item.nombre} (x{item.cantidad})</span>
                                             <span>${(item.precio_unitario * item.cantidad).toFixed(2)}</span>
                                         </div>
@@ -101,7 +109,10 @@ export default function ComprasPage() {
                                 </div>
                                 <div className="border-t pt-4 space-y-2 text-sm text-black">
                                     <div className="flex justify-between"><span>Subtotal:</span> <span>${calcularSubtotal(selectedCompra.items).toFixed(2)}</span></div>
-                                    <div className="flex justify-between"><span>Envío:</span> <span>${selectedCompra.envio.toFixed(2)}</span></div>
+                                    <div className="flex justify-between">
+                                        <span>Envío e impuestos:</span> 
+                                        <span>${(selectedCompra.total - calcularSubtotal(selectedCompra.items)).toFixed(2)}</span>
+                                    </div>
                                     <div className="flex justify-between font-bold text-base mt-2"><span>Total pagado:</span> <span>${selectedCompra.total.toFixed(2)}</span></div>
                                 </div>
                             </div>

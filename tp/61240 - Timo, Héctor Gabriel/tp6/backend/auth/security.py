@@ -12,7 +12,7 @@ from database import get_session
 
 # --- Configuración de Seguridad ---
 # ⚠️ En producción, siempre lee esto desde variables de entorno (.env)
-SECRET_KEY = "un-secreto-muy-secreto-y-dificil-de-adivinar"  # Cambiar por una clave segura
+SECRET_KEY = "clave-secreta"  # Cambiar por una clave segura
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 

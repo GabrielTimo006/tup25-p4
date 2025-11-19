@@ -53,8 +53,11 @@ export default function CheckoutPage() {
             setPurchaseStatus('success');
             await fetchCart(); // Refrescar el carrito (que ahora estará vacío)
 
-        } catch (err: any) {
-            const errorMessage = err.message || 'Ocurrió un error al procesar la compra.';
+        } catch (err) {
+            let errorMessage = 'Ocurrió un error al procesar la compra.';
+            if (err instanceof Error) {
+                errorMessage = err.message;
+            }
             setError(errorMessage);
             setPurchaseStatus('error');
         } finally {

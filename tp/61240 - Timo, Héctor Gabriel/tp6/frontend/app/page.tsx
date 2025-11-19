@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { getProductos } from "@/services/api";
 import { Producto } from "@/types";
 import ProductoCard from "@/components/ProductoCard";
@@ -31,21 +31,21 @@ export default function Home() {
     fetchCategorias();
   }, []);
 
-  const fetchProductos = async () => {
+  const fetchProductos = useCallback(async () => {
     setLoading(true);
     try {
       const data = await getProductos(searchQuery, selectedCategory);
       setProductos(data);
     } catch (error) {
-      console.error("Error al buscar productos:", error);
+      console.error("Error al cargar productos:", error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [searchQuery, selectedCategory]);
 
   useEffect(() => {
     fetchProductos();
-  }, [searchQuery, selectedCategory, cart]); // Añadimos 'cart' a las dependencias
+  }, [fetchProductos, cart]); // Ahora dependemos de la función memoizada y del carrito
 
     return (
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

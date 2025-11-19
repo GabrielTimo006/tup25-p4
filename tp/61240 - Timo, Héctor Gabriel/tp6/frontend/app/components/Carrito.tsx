@@ -2,6 +2,7 @@
 
 import { useCart } from "@/context/CartContext";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export default function Carrito() {
     const { cart, loading, error, removeFromCart, increaseQuantity, decreaseQuantity, cancelCart } = useCart();
@@ -40,7 +41,14 @@ export default function Carrito() {
                 {cart.items.map(item => (
                     <div key={item.producto.id} className="flex items-center justify-between border-b pb-2">
                         <div className="flex items-center gap-3">
-                            <img src={item.producto.imagen} alt={item.producto.titulo} className="w-12 h-12 object-contain rounded" />
+                            <Image 
+                                src={item.producto.imagen} 
+                                alt={item.producto.titulo} 
+                                width={48} 
+                                height={48} 
+                                className="object-contain rounded"
+                                unoptimized={true}
+                            />
                             <div>
                                 <p className="font-semibold text-sm text-white">{item.producto.titulo}</p>
                                 <div className="flex items-center gap-2 mt-1">

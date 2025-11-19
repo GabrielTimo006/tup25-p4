@@ -37,8 +37,12 @@ export function CartProvider({ children, onProductUpdate }: CartProviderProps) {
                 if (!token) throw new Error("No autenticado");
                 const cartData = await getCarrito(token);
                 setCart(cartData);
-            } catch (err: any) {
-                setError(err.message);
+            } catch (err) {
+                let errorMessage = "Ocurrió un error al cargar el carrito.";
+                if (err instanceof Error) {
+                    errorMessage = err.message;
+                }
+                setError(errorMessage);
             } finally {
                 setLoading(false);
             }
@@ -59,10 +63,14 @@ export function CartProvider({ children, onProductUpdate }: CartProviderProps) {
             if (onProductUpdate) {
                 onProductUpdate(); // Llamamos a la función para refrescar los productos
             }
-        } catch (err: any) {
-            setError(err.message);
+        } catch (err) {
+            let errorMessage = "Ocurrió un error al actualizar el carrito.";
+            if (err instanceof Error) {
+                errorMessage = err.message;
+            }
+            setError(errorMessage);
             // En lugar de una alerta, puedes usar un sistema de notificaciones más elegante
-            console.error("Error al actualizar el carrito:", err.message);
+            console.error("Error al actualizar el carrito:", errorMessage);
             throw err; // Relanzar el error para que el componente que llama pueda manejarlo
         }
     };

@@ -37,7 +37,7 @@ export interface CompraRead {
 export interface UsuarioCreate {
     nombre: string;
     email: string;
-    password: str
+    password: string;
 }
 
 export interface UsuarioRead {
@@ -49,4 +49,9 @@ export interface UsuarioRead {
 export interface FinalizarCompraRequest {
     direccion: string;
     tarjeta: string;
+}
+
+export interface ItemCarrito {
+    producto_id: number;
+    cantidad: number;
 }

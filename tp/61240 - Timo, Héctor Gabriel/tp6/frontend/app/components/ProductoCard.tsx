@@ -2,6 +2,7 @@
 
 import { Producto } from "@/types";
 import { useAuth } from "@/context/AuthContext";
+import Image from "next/image";
 import { useCart } from "@/context/CartContext";
 import { useRouter } from "next/navigation";
 
@@ -23,16 +24,26 @@ export default function ProductoCard({ producto, onProductUpdate }: ProductoCard
         try {
             await addToCart(producto.id, 1);
             onProductUpdate(); // Llama a la función para recargar los productos
-        } catch (error: any) {
+        } catch (error) {
             // En lugar de una alerta, mostramos el error en la consola para no interrumpir.
-            console.error("Error al agregar al carrito:", error.message);
+            let errorMessage = "Ocurrió un error desconocido";
+            if (error instanceof Error) {
+                errorMessage = error.message;
+            }
+            console.error("Error al agregar al carrito:", errorMessage);
         }
     };
 
     return (
         <div className="border rounded-lg p-4 flex flex-col">
             <div className="relative w-full h-48 mb-4">
-                <img src={producto.imagen} alt={producto.titulo} className="w-full h-full object-contain" />
+                <Image 
+                    src={producto.imagen} 
+                    alt={producto.titulo} 
+                    fill 
+                    style={{ objectFit: 'contain' }}
+                    unoptimized={true}
+                />
             </div>
             <h2 className="text-lg font-bold flex-grow">{producto.titulo}</h2>
             <p className="text-sm text-gray-500 mb-2">{producto.categoria}</p>

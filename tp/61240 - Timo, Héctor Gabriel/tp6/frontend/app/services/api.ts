@@ -1,4 +1,4 @@
-import { CarritoRead, CompraRead, FinalizarCompraRequest, ItemCarritoCreate, Producto, UsuarioCreate, UsuarioRead } from "@/types";
+import { CarritoRead, CompraRead, FinalizarCompraRequest, ItemCarrito, Producto, UsuarioCreate, UsuarioRead } from "@/types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -77,7 +77,7 @@ export async function getCarrito(token: string): Promise<CarritoRead> {
     return procesarRespuestaCarrito(carrito);
 }
 
-export async function agregarAlCarrito(item: ItemCarritoCreate, token: string): Promise<CarritoRead> {
+export async function agregarAlCarrito(item: ItemCarrito, token: string): Promise<CarritoRead> {
     const res = await fetch(`${API_URL}/carrito`, {
         method: 'POST',
         headers: {
